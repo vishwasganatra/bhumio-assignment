@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PDF Loader</title>
+</head>
+
+<body>
+    <button onclick="loadPDF()">Load PDF</button>
+    <button onclick="savePDF()">Save PDF</button>
+    <iframe id="pdfFrame" width="100%" height="500px" style="display: none;"></iframe>
+
+    <script>
+        async function loadPDF() {
+            try {
+                const response = await fetch('http://127.0.0.1:3000/files/1'); // Replace with your API endpoint to fetch the PDF
+                const blob = await response.blob();
+
+                const objectURL = URL.createObjectURL(blob);
+                const pdfFrame = document.getElementById('pdfFrame');
+                pdfFrame.src = objectURL;
+                pdfFrame.style.display = 'block';
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+            }
+        }
+
+        function savePDF() {
+            const pdfFrame = document.getElementById('pdfFrame');
+            const pdfUrl = pdfFrame.src;
+
+            fetch(pdfUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'example.pdf'); // Create FormData with the PDF blob
+
+                    fetch('http://127.0.0.1:3000/files/upload', {
+                        method: 'PUT',
+                        body: formData,
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('File uploaded:', data); // Log the uploaded file details
+                        })
+                        .catch(error => {
+                            console.error('Error uploading file:', error); // Handle any upload errors
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching PDF:', error); // Handle fetch errors
+                });
+        }
+    </script>
+</body>
+
+</html>

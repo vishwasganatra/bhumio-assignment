@@ -2,7 +2,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class File {
+export class Files {
   @PrimaryGeneratedColumn()
   id: number;
 
